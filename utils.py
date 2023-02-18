@@ -24,19 +24,23 @@ def coverage(graph):
     list_of_nodes=[]
     node_list = list(graph.nodes)
     while(l <= len(node_list)):
-        for path in nx.all_simple_paths(graph, source=l, target=len(node_list)+1):
+        print("While loop has started running")
+        for path in nx.shortest_path(graph, l):
+            print("For loop has started running")
             paths.append(path)      # put all the paths from node l to the last node in an array
-        for i in range(0, len(paths)):
-            list_of_nodes += paths[i] # concat all the paths
-        set_of_nodes = set(list_of_nodes) # convert the nodes in the paths to a set
+        # for i in range(0, len(paths)):
+        #     list_of_nodes += paths[i] # concat all the paths
+        print(f"Path for node {l} is: ", paths)
+        set_of_nodes = set(paths) # convert the nodes in the paths to a set
         list_of_coverage.append(set_of_nodes)
         l += 1
         # Clear these before starting the iteration
         paths.clear()
         list_of_nodes.clear()  
+        print(f"List of sets after iteration {l} is: ", list_of_coverage)
     return list_of_coverage
 
-def random_edge_weights(graph, edges, threshold):
+def random_weighted_graph(graph, edges, threshold):
     """
     This function assigns edges to the graph given a threshold of the weight of the edge.
     Any weight below the threshold will lead to the edge being deleted
@@ -45,6 +49,9 @@ def random_edge_weights(graph, edges, threshold):
           pass your edges here
           choose a threshold between 0 and 1
     """
+
+    # graph = graph(no_of_nodes)  # Import the graph function
+    
     # Creatting random edges
     weights = []
     for i in range(0, len(edges)):
@@ -64,6 +71,8 @@ def random_edge_weights(graph, edges, threshold):
     graph.add_weighted_edges_from(new_edges)  #add the weighted edges to the graph
     weighted_edges.clear() # clear the lsit
 
+    print("Weighted Graph Created")
+
     return graph
 
 def plot_graph(graph, color):
@@ -73,3 +82,36 @@ def plot_graph(graph, color):
     nx.draw(graph, with_labels=True, node_color=color) #draw the network graph 
     plt.figure()
     plt.show() #to show the graph by plotting it
+
+def greedy(list_of_covered_nodes, k):
+    
+    nodes_covered = set()
+
+    subsets = list_of_covered_nodes
+
+    selected = []
+    selected_nodes = []
+    
+    tempList = subsets
+
+    k = k
+
+    while(len(selected) <= k):
+        x = set()
+        a = []
+        for i in range(len(tempList)):
+            x = tempList[i] - nodes_covered # save all new items that the set adds to the soln set
+            a.append(x)
+            print("subsets",a)
+        index = a.index(max(a))
+        nodes_covered = nodes_covered | tempList[index]
+        print("Current Solution Set: ", nodes_covered)
+        selected.append(tempList[index])
+        tempList[index] = set() # set the selected set to a null set
+        print('The selected sets are: ', selected)
+
+        selected_nodes =  selected_nodes.append(index)   
+    
+    return selected_nodes, nodes_covered
+
+    
