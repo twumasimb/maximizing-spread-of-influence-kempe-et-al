@@ -14,7 +14,7 @@ def graph(no_of_nodes):
 
     return G
 
-def coverage(graph, node_list):
+def coverage(graph):
     """
     This function returns a list with all the paths of each of the nodes in order
     """
@@ -22,7 +22,8 @@ def coverage(graph, node_list):
     paths = []
     list_of_coverage = []
     list_of_nodes=[]
-    while(l <= len(node_list+1)):
+    node_list = list(graph.nodes)
+    while(l <= len(node_list)+1):
         for path in nx.all_simple_paths(graph, source=l, target=len(node_list+1)):
             paths.append(path)      # put all the paths from node l to the last node in an array
         for i in range(0, len(paths)):
