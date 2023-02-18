@@ -48,23 +48,20 @@ def random_edge_weights(graph, edges, threshold):
     weights = []
     for i in range(0, len(edges)):
         weights.append(random.randint(0,10)*0.1)
-    weights 
 
     weighted_edges = []
     weighted_edges = edges
     for i in range(0, len(edges)):
         weighted_edges[i].append(weights[i])
-    weighted_edges
 
     # Get edges that have weights greater that 0.6
     new_edges = []
     for i in range(0, len(weighted_edges)):
         if(weighted_edges[i][2] > threshold):
             new_edges.append(weighted_edges[i])
-    weighted_edges.clear()
-    new_edges
 
-    graph.add_weighted_edges_from(new_edges)
+    graph.add_weighted_edges_from(new_edges)  #add the weighted edges to the graph
+    weighted_edges.clear() # clear the lsit
 
     return graph
 
