@@ -23,8 +23,8 @@ def coverage(graph):
     list_of_coverage = []
     list_of_nodes=[]
     node_list = list(graph.nodes)
-    while(l <= len(node_list)+1):
-        for path in nx.all_simple_paths(graph, source=l, target=len((node_list)+1)):
+    while(l <= len(node_list)):
+        for path in nx.all_simple_paths(graph, source=l, target=len(node_list)+1):
             paths.append(path)      # put all the paths from node l to the last node in an array
         for i in range(0, len(paths)):
             list_of_nodes += paths[i] # concat all the paths
