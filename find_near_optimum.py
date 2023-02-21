@@ -1,6 +1,5 @@
 import utils
 
-
 # important variables
 limit = 0.4
 # creating my graph
@@ -21,3 +20,6 @@ chosen_nodes, nodes_covered = utils.greedy(list_of_covered_nodes, constraint)
 
 print("The selected nodes are: ",chosen_nodes)
 print("The selected sets are: ", nodes_covered)
+
+sample_icm_grapths = utils.sample_live_icm(new_graph, 100)
+print(sample_icm_grapths)

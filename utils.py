@@ -37,7 +37,7 @@ def coverage(graph):
         # Clear these before starting the iteration
         paths.clear()
         list_of_nodes.clear()  
-        print(f"List of sets after iteration {l} is: ", list_of_coverage)
+        print(f"List of sets after iteration {l-1} is: ", list_of_coverage)
     return list_of_coverage
 
 def random_weighted_graph(graph, edges, threshold):
@@ -55,7 +55,7 @@ def random_weighted_graph(graph, edges, threshold):
     # Creatting random edges
     weights = []
     for i in range(0, len(edges)):
-        weights.append(random.randint(0,10)*0.1)
+        weights.append(random.random())
 
     weighted_edges = []
     weighted_edges = edges
@@ -96,7 +96,7 @@ def greedy(list_of_covered_nodes, k):
 
     k = k
 
-    while(len(selected) <= k):
+    while(len(selected) < k):
         x = set()
         a = []
         for i in range(len(tempList)):
@@ -110,8 +110,25 @@ def greedy(list_of_covered_nodes, k):
         tempList[index] = set() # set the selected set to a null set
         print('The selected sets are: ', selected)
 
-        selected_nodes =  selected_nodes.append(index)   
+        selected_nodes.append((index+1))   # adding one because indeces in python start from 0
     
     return selected_nodes, nodes_covered
 
+# Code from The Group Influence Paper
+
+def sample_live_icm(g, num_graphs):
+    '''
+    Returns num_graphs live edge graphs sampled from the ICM on g. Assumes that
+    each edge has a propagation probability accessible via g[u][v]['p'].
+    '''
+    import networkx as nx
+    live_edge_graphs = []
+    for _ in range(num_graphs):
+        h = nx.Graph()
+        h.add_nodes_from(g.nodes())
+        for u,v in g.edges():
+            if random.random() < g[u][v]['p']:
+                h.add_edge(u,v)
+        live_edge_graphs.append(h)
+    return live_edge_graphs
     
