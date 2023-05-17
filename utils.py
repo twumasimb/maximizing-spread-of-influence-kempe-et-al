@@ -22,6 +22,7 @@ def sample_w_icm(g, num_of_networks):
         gen_nets.append(h)
     return gen_nets
 
+# Find the average coverage of a selected solution set over all the generated networks
 def average_coverage(Set, list_of_graphs):
     list_of_nodes = list(Set)
     total_size = 0
@@ -46,9 +47,11 @@ def get_nodes(graph):
         y.append(i)
     return y
 
-def greedy(graphList, k):
+def greedy(graph, num_of_networks, k):
+    graph = assign_weights(graph)
+    sampled_graph = sample_w_icm(g, num_of_networks)
     S = set()
-    list_of_nodes = get_nodes(graphList[0])
+    list_of_nodes = get_nodes(sampled_graph[0])
     gain = []
     while(len(S)) < k:
         list_of_marginal_gains = []
@@ -56,7 +59,7 @@ def greedy(graphList, k):
             A = set()
             A.add(item)
             A = A | S
-            marginal_gain = average_coverage(A, graphList) - average_coverage(S, graphList)
+            marginal_gain = average_coverage(A, sampled_graph) - average_coverage(S, sampled_graph)
             list_of_marginal_gains.append(marginal_gain)
         index = list_of_marginal_gains.index(max(list_of_marginal_gains))
         gain.append(max(list_of_marginal_gains))
