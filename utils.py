@@ -1,134 +1,65 @@
-# importing the necessary libraries
+#importing important libraries
 import networkx as nx
-import random
 import matplotlib.pyplot as plt
+import random
 
-def graph(no_of_nodes):
-    """
-    This function create a graph whose vertices are numbers from 1
-    to the number of nodes specified by the user
-    """
-    G = nx.Graph()
-    node_list = range(1, no_of_nodes+1)
-    G.add_nodes_from(node_list)
-
-    return G
-
-def coverage(graph):
-    """
-    This function returns a list with all the paths of each of the nodes in order
-    """
-    l = 1
-    paths = []
-    list_of_coverage = []
-    list_of_nodes=[]
-    node_list = list(graph.nodes)
-    while(l <= len(node_list)):
-        print("While loop has started running")
-        for path in nx.shortest_path(graph, l):
-            print("For loop has started running")
-            paths.append(path)      # put all the paths from node l to the last node in an array
-        # for i in range(0, len(paths)):
-        #     list_of_nodes += paths[i] # concat all the paths
-        print(f"Path for node {l} is: ", paths)
-        set_of_nodes = set(paths) # convert the nodes in the paths to a set
-        list_of_coverage.append(set_of_nodes)
-        l += 1
-        # Clear these before starting the iteration
-        paths.clear()
-        list_of_nodes.clear()  
-        print(f"List of sets after iteration {l-1} is: ", list_of_coverage)
-    return list_of_coverage
-
-def random_weighted_graph(graph, edges, threshold):
-    """
-    This function assigns edges to the graph given a threshold of the weight of the edge.
-    Any weight below the threshold will lead to the edge being deleted
-
-    Tips: pass your graph here
-          pass your edges here
-          choose a threshold between 0 and 1
-    """
-
-    # graph = graph(no_of_nodes)  # Import the graph function
-    
-    # Creatting random edges
-    weights = []
-    for i in range(0, len(edges)):
-        weights.append(random.random())
-
-    weighted_edges = []
-    weighted_edges = edges
-    for i in range(0, len(edges)):
-        weighted_edges[i].append(weights[i])
-
-    # Get edges that have weights greater that 0.6
-    new_edges = []
-    for i in range(0, len(weighted_edges)):
-        if(weighted_edges[i][2] > threshold):
-            new_edges.append(weighted_edges[i])
-
-    graph.add_weighted_edges_from(new_edges)  #add the weighted edges to the graph
-    weighted_edges.clear() # clear the lsit
-
-    print("Weighted Graph Created")
-
+# Adding weights to the ICM graph
+def assign_weights(graph):
+    for u,v in graph.edges():
+        weight = 1/(graph.degree(v))
+        graph[u][v]['weight'] = weight
     return graph
 
-def plot_graph(graph, color):
-    """
-    Pass the graph. The color must be passed as string
-    """
-    nx.draw(graph, with_labels=True, node_color=color) #draw the network graph 
-    plt.figure()
-    plt.show() #to show the graph by plotting it
-
-def greedy(list_of_covered_nodes, k):
-    
-    nodes_covered = set()
-
-    subsets = list_of_covered_nodes
-
-    selected = []
-    selected_nodes = []
-    
-    tempList = subsets
-
-    k = k
-
-    while(len(selected) < k):
-        x = set()
-        a = []
-        for i in range(len(tempList)):
-            x = tempList[i] - nodes_covered # save all new items that the set adds to the soln set
-            a.append(x)
-            print("subsets",a)
-        index = a.index(max(a))
-        nodes_covered = nodes_covered | tempList[index]
-        print("Current Solution Set: ", nodes_covered)
-        selected.append(tempList[index])
-        tempList[index] = set() # set the selected set to a null set
-        print('The selected sets are: ', selected)
-
-        selected_nodes.append((index+1))   # adding one because indeces in python start from 0
-    
-    return selected_nodes, nodes_covered
-
-# Code from The Group Influence Paper
-
-def sample_live_icm(g, num_graphs):
-    '''
-    Returns num_graphs live edge graphs sampled from the ICM on g. Assumes that
-    each edge has a propagation probability accessible via g[u][v]['p'].
-    '''
-    import networkx as nx
-    live_edge_graphs = []
-    for _ in range(num_graphs):
+# Function to generate the graphs with random weights
+def sample_w_icm(g, num_of_networks):
+    gen_nets = []
+    for n in range(num_of_networks):
         h = nx.Graph()
         h.add_nodes_from(g.nodes())
         for u,v in g.edges():
-            if random.random() < g[u][v]['p']:
+            if random.random() < g[u][v]['weight']:
                 h.add_edge(u,v)
-        live_edge_graphs.append(h)
-    return live_edge_graphs
+        gen_nets.append(h)
+    return gen_nets
+
+def average_coverage(Set, list_of_graphs):
+    list_of_nodes = list(Set)
+    total_size = 0
+    average_coverage = 0
+    for graph in list_of_graphs:
+        set_of_nodes_covered = set()
+        if (len(list_of_nodes) == 0):
+            average_coverage = 0
+        else:
+            for item in list_of_nodes:
+                coverage_in_a_single_graph = nx.node_connected_component(graph, item)
+                set_of_nodes_covered = set_of_nodes_covered.union(coverage_in_a_single_graph)
+        size_of_coverage_in_the_graph = len(set_of_nodes_covered)
+        total_size += size_of_coverage_in_the_graph
+    average_coverage = total_size/len(list_of_graphs)
     
+    return average_coverage
+
+def get_nodes(graph):
+    y = []
+    for i in range(len(graph.nodes)):
+        y.append(i)
+    return y
+
+def greedy(graphList, k):
+    S = set()
+    list_of_nodes = get_nodes(graphList[0])
+    gain = []
+    while(len(S)) < k:
+        list_of_marginal_gains = []
+        for item in list_of_nodes:
+            A = set()
+            A.add(item)
+            A = A | S
+            marginal_gain = average_coverage(A, graphList) - average_coverage(S, graphList)
+            list_of_marginal_gains.append(marginal_gain)
+        index = list_of_marginal_gains.index(max(list_of_marginal_gains))
+        gain.append(max(list_of_marginal_gains))
+        S.add(list_of_nodes[index])
+        list_of_nodes.pop(index)
+    return S, gain
