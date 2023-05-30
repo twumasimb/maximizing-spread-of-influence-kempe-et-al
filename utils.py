@@ -49,7 +49,7 @@ def get_nodes(graph):
 
 def greedy(graph, num_of_networks, k):
     graph = assign_weights(graph)
-    sampled_graph = sample_w_icm(g, num_of_networks)
+    sampled_graph = sample_w_icm(graph, num_of_networks)
     S = set()
     list_of_nodes = get_nodes(sampled_graph[0])
     gain = []
